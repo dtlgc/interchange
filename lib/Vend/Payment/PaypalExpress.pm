@@ -235,7 +235,7 @@ BEGIN {
 		die $msg;
 	}
 
-	::logGlobal("%s v1.0.4 payment module loaded",__PACKAGE__)
+	::logGlobal("%s v1.0.4b payment module loaded",__PACKAGE__)
 		unless $Vend::Quiet or ! $Global::VendRoot;
 }
 
@@ -255,7 +255,6 @@ my $pprequest   = $in->{'pprequest'} || charge_param('pprequest') || 'setrequest
 my $username    = charge_param('id') or die "No username id\n";
 my $password    = charge_param('password') or die "No password\n";
 my $signature   = charge_param('signature') or die "No signature found\n"; # use this as certificate is broken
-my $ca2state    = $::Values->{'ca_2letter_state'} || charge_param('ca_2letter_state') || '1'; # 0 or no to not convert Canadian state/province to uppercased 2 letter variant.
 my $ppcheckreturn = $::Values->{ppcheckreturn} || 'ord/checkout';
 my $checkouturl = $Tag->area({ href => "$ppcheckreturn" });
 
@@ -298,6 +297,7 @@ my $address1           = $::Values->{address1};
 my $address2           = $::Values->{address2};
 my $city               = $::Values->{city};
 my $state              = $::Values->{state};
+my $defaultCAstate     = charge_param('default_ca_province') || 'ON';
 my $zip                = $::Values->{zip};
 my $country            = $::Values->{country};
    $country = 'GB' if ($country eq 'UK'); # plonkers reject UK
@@ -511,8 +511,8 @@ return $Tag->deliver({ location => $redirecturl })
 	    $::Values->{city}           = $result{GetExpressCheckoutDetailsResponseDetails}{PayerInfo}{Address}{CityName};
 	    $::Values->{state}          = $result{GetExpressCheckoutDetailsResponseDetails}{PayerInfo}{Address}{StateOrProvince};
 	    $::Values->{zip}            = $result{GetExpressCheckoutDetailsResponseDetails}{PayerInfo}{Address}{PostalCode};
-	    $::Values->{country}        = $result{GetExpressCheckoutDetailsResponseDetails}{PayerInfo}{Address}{Country};
 	    $::Values->{countryname}    = $result{GetExpressCheckoutDetailsResponseDetails}{PayerInfo}{Address}{CountryName};
+		$::Values->{country}        = $result{GetExpressCheckoutDetailsResponseDetails}{PayerInfo}{Address}{Country};
 	              }
 		   }
 
@@ -529,15 +529,17 @@ return $Tag->deliver({ location => $redirecturl })
        $country = $::Values->{country} || $::Values->{b_country};
        $state = $::Values->{state} || $::Values->{b_state};
   
-  if (($country eq 'CA') and ($ca2state =~ /1|y/)) {
+  if ($country eq 'CA')  {
+       $state = 'Yukon Territory' if ($state =~ /Yukon/i);
     my $db  = dbref('state') or warn errmsg("PP cannot open state table");
     my $dbh = $db->dbh() or warn errmsg("PP cannot get handle for tbl 'state'");
     my $sth = $dbh->prepare("SELECT state FROM state WHERE name='$state' AND country='CA'");
        $sth->execute() or warn errmsg("PP cannot execute at ln610");
-       $state = $sth->fetchrow() or warn errmsg("PP no state unless defined $state");
+       $state = $sth->fetchrow() || $defaultCAstate;
        
        $::Values->{b_state} = $state if ($::Values->{pp_use_billing_address} == 1);
        $::Values->{state} = $state;
+#::logDebug(":PP:".__LINE__.": state=$state; vstate=$::Values->{state}, $::Values->{b_state}");
       }
   
   }
@@ -750,7 +752,7 @@ return $Tag->deliver({ location => $redirecturl })
 
 delete $::Values->{returnurl};
 
-#::logDebug("PP".__LINE__." result:" .::uneval(\%result));
+::logDebug("PP".__LINE__." result:" .::uneval(\%result));
     return (%result);
 
 }
