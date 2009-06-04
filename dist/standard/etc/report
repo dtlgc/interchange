@@ -1,6 +1,7 @@
 [seti order_text]
 -     ORDER DATE: [tag time]%c[/tag]
     ORDER NUMBER: [value mv_order_number]
+  TRANSACTION ID: [value mv_transaction_id] / [data session payment_id]
      LEAD SOURCE: [data session source]
    REFERRING URL: [data session referer]
 
@@ -14,7 +15,7 @@
 City, State, Zip: [value city], [value state]  [value zip]
          Country: [value country]
 
-  Payment Method: [value mv_payment]
+  Payment Method: [value mv_payment] [if mv_payment eq PaypalExpress](Payer: [value payerstatus], Address: [value address_status])[/if]
 [if value mv_credit_card_info]         
 Credit Card Info:
 ----------------

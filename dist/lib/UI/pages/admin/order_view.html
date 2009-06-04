@@ -117,7 +117,8 @@
                               </tr>
                               <tr> 
                                  <td nowrap class="block4bold">[L]Payment type[/L]:</td>
-                                 <td class="maincontent">[loop-data transactions payment_method]</td>
+                                 <td class="maincontent">[loop-data transactions payment_method]
+                                 [if-loop-data transactions payment_method =~ /paypal/i] Paypal - [loop-data transactions pppayerstatus][/if-loop-data]</td>
                               </tr>
 							  [if-loop-data transactions shipmode]
                               <tr> 
@@ -292,7 +293,8 @@
                                  <td class="maincontent">[data table=country col=name key="[loop-data transactions country]"]</td>
                               </tr>
                               <tr> 
-                                 <td height="15" colspan="2" class="block4bold"><img src="bg.gif" width="1" height="1"></td>
+                                 <td height="15" colspan="2" class="maincontent"><img src="bg.gif" width="1" height="1">
+                                 [if-loop-data transactions payment_method =~ /paypal/i] - [loop-data transactions ppaddressstatus][/if-loop-data]</td>
                               </tr>
                            </table>
                         </td>

@@ -197,7 +197,7 @@ sub {
 			}
 		}
 	}
-
+#::logDebug("update-order-status:finish processing $opt->{status},$opt->{tracking_number}");
 	if($opt->{status} =~ /\d\d\d\d/) {
 		$tdb->set_field($on, 'status', $opt->{status});
 	}
