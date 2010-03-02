@@ -550,6 +550,8 @@ sub create_text_query {
 	if(! $TextQuery) {
 		die ::errmsg("No Text::Query module installed, cannot use op=%s", $op);
 	}
+        # text query complains if empty string - exit
+        if ($string eq '') { return sub {undef;} }
 
 	$s ||= {};
 	$op ||= 'sq';
