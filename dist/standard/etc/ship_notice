@@ -16,6 +16,31 @@ We have made a partial shipment of your order #[loop-code].
 [/else]
 [/if]
 
+[query list=1 sql="select * from transactions where code = '[loop-code]' order by order_date"]
+[tmp tt_status][sql-param status][/tmp][tmp tt_tst]shipped[/tmp]
+[if type=explicit
+    compare= "[calc]$Scratch->{tt_status} eq $Scratch->{tt_tst}[/calc]"]
+   [tmp tt_carrier][sql-param carrier][/tmp] [tmp tt_tmp]UPS[/tmp]
+ [if type=explicit
+    compare= "[calc]$Scratch->{tt_carrier} eq $Scratch->{tt_tmp}[/calc]"]
+Tracking Information: (Please allow 24 hrs for tracking to become available)
+UPS Tracking: [sql-param tracking_number]
+http://wwwapps.ups.com/etracking/tracking.cgi?InquiryNumber1=[sql-param tracking_number]&TypeOfInquiryNumber=T
+   [/if][tmp tt_tmp]USPS[/tmp]
+   [if type=explicit
+    compare= "[calc]$Scratch->{tt_carrier} eq $Scratch->{tt_tmp}[/calc]"]
+Tracking Information: (Please allow 24 hrs for tracking to become available)
+US Mail Tracking Number: [sql-param tracking_number]
+   [/if] [tmp tt_tmp]FEDEX[/tmp]
+   [if type=explicit
+    compare= "[calc]$Scratch->{tt_carrier} eq $Scratch->{tt_tmp}[/calc]"]
+Tracking Information: (Please allow 24 hrs for tracking to become available)
+Fedex Tracking: [sql-param tracking_number]
+http://www.fedex.com/cgi-bin/tracking?action=track&language=english&cntry_code=us&initial=x&mps=y&tracknumbers=[sql-param tracking_number]
+[/if]
+[/if]
+[/query]
+
             Name: [loop-data transactions fname] [loop-data transactions lname]
 [if-loop-data transactions company]         Company: [loop-data transactions company][/if-loop-data]
    Email address: [loop-data transactions email]
