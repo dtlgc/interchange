@@ -113,7 +113,6 @@ sub calculate {
 				or last CACHE;
 			my $tname = $db->name();
 			$cache = 1;
-			$weight = ($weight == int $weight) ? $weight : int($weight+1);
 			%cline = (
 				weight => $weight,
 				origin => $origin,
