@@ -244,7 +244,7 @@ the card number.  Please <b>do not</b> enter your card's PIN number here.</small
                 [loop option=mv_credit_card_exp_year lr=1 list=`
                 my $year = $Tag->time( '', { format => '%Y' }, '%Y' );
                 my $out = '';
-                for ($year .. $year + 7) {
+                for ($year .. $year + 10) {
                         /\d\d(\d\d)/;
                         $last_two = $1;
                         $out .= "$last_two\t$_\n";
