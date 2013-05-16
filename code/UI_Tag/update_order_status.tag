@@ -89,16 +89,8 @@ sub {
 	if($opt->{settle_transaction}) {
 		my $oid = $trec->{order_id};
 		my $amount = $trec->{total_cost};
-		my $ptype = $trec->{payment_method};
 		SETTLE: {
-		       if ($ptype =~ m/paypal/i) {$tdb->set_field($on, 'order_id', "$oid*");
-                        Vend::Tags->warning( errmsg(
-                                                    "Order ID %s completed.",
-                                                    $oid,
-                                                    ),
-			                         );
-                       }
-			 elsif(! $oid) {
+		     	 if(! $oid) {
 				Vend::Tags->error( {
 								name => 'settle_transaction',
 								set => "No order ID to settle!",
